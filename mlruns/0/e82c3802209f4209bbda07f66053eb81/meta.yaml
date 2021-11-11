@@ -1,0 +1,15 @@
+artifact_uri: file:///home/madan/Original_PDM/PyTorch-Transformer-for-RUL-Prediction/mlruns/0/e82c3802209f4209bbda07f66053eb81/artifacts
+end_time: 1636544427647
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: e82c3802209f4209bbda07f66053eb81
+run_uuid: e82c3802209f4209bbda07f66053eb81
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1636544082092
+status: 3
+tags: []
+user_id: madan

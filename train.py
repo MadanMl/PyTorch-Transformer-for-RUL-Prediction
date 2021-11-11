@@ -7,7 +7,7 @@ from visualize import *
 import os
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import argparse
-
+import mlflow
 
 
 
@@ -67,7 +67,7 @@ def training():
 
         with torch.no_grad():
             rmse, result = testing(group_test, y_test, model)
-
+        mlflow.log_metric(key='training_epoch_loss', value= epoch_loss / 100, step=epoch)
         print("Epoch: %d, training loss: %1.5f, testing rmse: %1.5f" % (epoch, epoch_loss / 100, rmse))
 
     return result, rmse
@@ -78,11 +78,14 @@ if __name__ == "__main__":
     parser.add_argument('--dataset', type=str, default='FD001', help='which dataset to run')
     opt = parser.parse_args()
     
-    num_epochs = 4 # Number of training epochs
+    num_epochs = 10   # Number of training epochs
     d_model = 128  # dimension in encoder
     heads = 4  # number of heads in multi-head attention
     N = 2  # number of encoder layers
     m = 14  # number of features
+    
+
+    
 
 
     
@@ -107,17 +110,24 @@ if __name__ == "__main__":
         # mean-squared error for regression
         criterion = torch.nn.MSELoss()
 
+        with mlflow.start_run(run_name = 'test'+'_n_epochs_'+str(num_epochs)) as run:
         # training with evaluation
-        result, rmse = training()
+            result, rmse = training()
+            mlflow.log_param('num_epochs',num_epochs)
+            mlflow.log_param('d_model',d_model)
+            mlflow.log_param('heads',heads)
+            mlflow.log_param('N',N)
+            mlflow.log_param('m',m)
+            mlflow.log_metric('final_test_rmse', rmse.item())
 
-        # testing already done in training() for each epoch to see live testing rmse, or
-        # can be done once after finish training
-        # model.eval()
-        # with torch.no_grad():
-        #     rmse, result = testing(group_test, y_test, model)
+            # testing already done in training() for each epoch to see live testing rmse, or
+            # can be done once after finish training
+            # model.eval()
+            # with torch.no_grad():
+            #     rmse, result = testing(group_test, y_test, model)
 
-        # visualize the testing result
-        visualize(result, rmse)
+            # visualize the testing result
+            visualize(result, rmse)
     else:
         print('Either dataset not implemented or not defined')
 
